@@ -44,7 +44,7 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 				position_fix = 1650,
 				timer = 0.7,
 				delay = 3,
-				kill_assets_delay = 3.5,
+				kill_assets_delay = 3.7,
 				type = "fighter",
 				random_x = false
 			}
@@ -83,7 +83,7 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 				launch_angle_x = -8000,
 				timer = 25,
 				delay = 5,
-				kill_assets_delay = 25,
+				kill_assets_delay = 27,
 				type = "orbital"
 			}
 		}
