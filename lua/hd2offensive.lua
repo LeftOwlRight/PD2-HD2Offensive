@@ -35,7 +35,7 @@ data: {
 
 --]]
 
-HD2Offensive = HD2Offensive or class()
+HD2Offensive = HD2Offensive or {}
 
 function HD2Offensive:throw(data)
 	-- self._units = self._units or {}
@@ -46,12 +46,13 @@ function HD2Offensive:throw(data)
 	local rot = data.rotation or Vector3()
 	local save_rot = mvector3.copy(rot)
 	local unit = data.unit
+	local name_id = data.name_id
 
 	local range_x = data.range_x or 0
 	local range_y = data.range_y or 0
 	local bombs = data.bombs or 1
 	local base_height = data.height or 8000
-	local ray_angle_x = data.launch_angle_x or 0
+	local ray_angle_x = data.launch_angle_x or 0 
 	local ray_angle_y = data.launch_angle_y or 0
 	local type = data.type or "orbital"
 	local timer = data.timer or 0
@@ -74,9 +75,27 @@ function HD2Offensive:throw(data)
 		z = mvector3.z(base_to_pos)
 	}
 
-	HD2OffensiveRedTrail:spawn(data)
+	local effect_id = HD2OffensiveRedTrail:spawn(data)
 
 	LuaNetworking:SendToPeers("sync_hd2offensive_red_trail", json.encode(data))
+	--]]
+
+	---[[ spawn hud
+	local data = {
+		name_id = name_id,
+		id = "HD2OffensiveHUD" .. tostring(effect_id or math.random()),
+		position = base_to_pos,
+		time = delay,
+		duration = timer,
+		progress = type == "orbital",
+		x = mvector3.x(base_to_pos),
+		y = mvector3.y(base_to_pos),
+		z = mvector3.z(base_to_pos)
+	}
+
+	HD2OffensiveHUD:new(data)
+
+	LuaNetworking:SendToPeers("sync_hd2offensive_hud", json.encode(data))
 	--]]
 
 	local base_from_pos = (base_to_pos + (rot:x() * ray_angle_x) + (rot:y() * ray_angle_y)) + Vector3(0, 0, base_height)
@@ -85,7 +104,7 @@ function HD2Offensive:throw(data)
 		base_from_pos = data.launch_position
 	end
 
-	for i = 1, bombs do
+	for i = 0, bombs - 1 do
 		DelayedCalls:Add("EagleAirstrike:" .. tostring(i) .. tostring(TimerManager:game():time()), delaye_t * i + delay, function()
 			if managers.network.session and managers.network:session() then
 				local offset_x = 0
@@ -197,10 +216,181 @@ function HD2OffensiveRedTrail:spawn(data)
 	local delay = TimerManager:game():time() + data.timer
 
 	managers.enemy:add_delayed_clbk(delayed_id, callback(self, self, "_kill", effect_id), delay)
+
+	return effect_id
 end
 
 function HD2OffensiveRedTrail:_kill(effect_id)
 	if World:effect_manager():alive(effect_id) then
 		World:effect_manager():kill(effect_id)
 	end
+end
+
+HD2OffensiveHUD = HD2OffensiveHUD or class()
+
+function HD2OffensiveHUD:init(data)
+	self._id = tostring(data.id)
+	self._position = data.position
+	self._left_time = data.time
+	self._duration = data.duration
+	self._progress = data.progress
+
+	self._wait_text = managers.localization:to_upper_text("hud_hd2offensive_inbound") .. " "
+
+	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2)
+	local hud_panel = hud.panel
+
+	self._panel = hud_panel:panel({
+		w = 200,
+		h = 45
+	})
+
+	--- [[ Left
+	self._base_panel = self._panel:panel({
+		w = 30,
+		h = self._panel:h()	
+	})
+
+	local base_panel = self._base_panel
+
+	-- base_panel:set_left(0)
+	base_panel:set_center_y(self._panel:h() / 2)
+
+	local bg_size_sub = 5
+	local bg = base_panel:bitmap({
+		render_template = "VertexColorTexturedBlur3D",
+		texture = "guis/textures/test_blur_df",
+		w = base_panel:w() - bg_size_sub,
+		h = base_panel:w() - bg_size_sub,
+		color = Color.white
+	})
+
+	bg:set_center_x(base_panel:w() / 2)
+	bg:set_center_y(bg:h() / 2 + bg_size_sub - 2.5)
+
+	if data.name_id then
+		local stratagem_icon = base_panel:bitmap({
+			texture = "guis/dlcs/pd2_dlc_hd2o/textures/pd2/hud/icons/" .. data.name_id,
+			layer = 2,
+			w = 32,
+			h = 32
+		})
+
+		stratagem_icon:set_center(bg:center_x(), bg:center_y())
+	end
+	
+	local arrow_icon, arrow_texture_rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
+	local arrow = base_panel:bitmap({
+		visible = true,
+		color = Color.yellow,
+		rotation = 180,
+		texture = arrow_icon,
+		texture_rect = arrow_texture_rect,
+		w = 12,
+		h = 6
+	})
+
+	arrow:set_center_x(bg:center_x())
+	arrow:set_bottom(base_panel:bottom() - 1)
+
+	self._distance = base_panel:text({
+		font = tweak_data.hud_players.ammo_font,
+		text = "0",
+		vertical = "bottom",
+		align = "center",
+		font_size = 10
+	})
+
+	self._distance:set_center_x(bg:center_x())
+	self._distance:set_bottom(arrow:top())
+	-- ]]
+
+	--- [[ Right
+	local bname = data.name_id and managers.localization:to_upper_text(data.name_id)
+
+	local name_text = nil
+	if bname then
+		name_text = self._panel:text({
+			font = tweak_data.hud_players.ammo_font,
+			text = bname,
+			-- vertical = "top",
+			-- align = "left",
+			font_size = 15,
+			color = Color.red
+		})
+
+		name_text:set_left(base_panel:right())
+	end
+
+	self._time_text = self._panel:text({
+		font = tweak_data.hud_players.ammo_font,
+		text = self._wait_text .. os.date("%M:%S", self._left_time),
+		vertical = "top",
+		align = "left",
+		font_size = 15
+	})
+
+
+	self._time_text:set_left(base_panel:right())
+
+	if name_text then
+		self._time_text:set_top(15)
+	end
+	-- ]]
+
+	-- 添加update
+	managers.hud:add_updator(self._id, callback(self, self, "update"))
+end
+
+function HD2OffensiveHUD:update(t, dt)
+	-- 获取并设置HUD在self._position上的2D空间位置
+	local camera = managers.viewport:get_current_camera()
+
+	if not camera then
+		return
+	end
+
+	local ws = managers.hud._workspace
+	local screen_pos = ws:world_to_screen(camera, self._position)
+	self._panel:set_left(screen_pos.x - self._base_panel:w() / 2)
+	self._panel:set_bottom(screen_pos.y)
+
+	local distance = mvector3.distance(managers.player:player_unit():position(), self._position)
+	local m_text = managers.localization:text("hud_hd2offensive_m")
+	self._distance:set_text(tostring(math.floor(distance / 100)) .. m_text)
+
+	if screen_pos.z > 1 then
+		self._panel:set_alpha(1)
+	else
+		self._panel:set_alpha(0)
+	end
+
+	if self._left_time > 0 then
+		self._left_time = self._left_time - dt
+		self._time_text:set_text(self._wait_text .. os.date("%M:%S", self._left_time))
+	elseif self._duration > 0 then
+		self._duration = self._duration - dt
+
+		local text = managers.localization:to_upper_text("hud_hd2offensive_impact")
+
+		if self._progress then
+			text = managers.localization:to_upper_text("hud_hd2offensive_ongoing")
+			text = text .. " " .. os.date("%M:%S", self._duration)
+		end
+
+		self._time_text:set_text(text)
+	end
+
+	-- 如果倒计时结束，摧毁HUD
+	if (self._left_time + self._duration) <= 0 then
+		self:destroy()  -- 摧毁HUD
+
+		managers.hud:remove_updator(self._id)  -- 关闭update
+	end
+end
+
+function HD2OffensiveHUD:destroy()
+	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_FULLSCREEN_PD2)
+	local hud_panel = hud.panel
+	hud_panel:remove(self._panel)
 end
