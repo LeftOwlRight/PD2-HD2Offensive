@@ -1,5 +1,5 @@
 <table name="HD2 Offensive" priority="-100">
-	<AssetUpdates id="52692" provider="modworkshop" use_local_dir="true" version="2"/>
+	<AssetUpdates id="52692" provider="modworkshop" use_local_dir="true" version="3"/>
 
 	<Localization default="english.txt" directory="loc">
 		<loc file="english.txt" language="english"/>	
@@ -48,6 +48,11 @@
 		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/blackmarket/icons/grenades/wpn_prj_hd2offensive_orbital_120mm"/>
 		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/blackmarket/icons/grenades/wpn_prj_hd2offensive_orbital_precision"/>
 		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/blackmarket/icons/grenades/wpn_prj_hd2offensive_orbital_gas"/>
+
+		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/hud/icons/bm_wpn_prj_hd2offensive_eagle_airstrike"/>
+		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/hud/icons/bm_wpn_prj_hd2offensive_orbital_120mm"/>
+		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/hud/icons/bm_wpn_prj_hd2offensive_orbital_precision"/>
+		<texture			path="guis/dlcs/pd2_dlc_hd2o/textures/pd2/hud/icons/bm_wpn_prj_hd2offensive_orbital_gas"/>
 	</AddFiles>
 
 	<Hooks directory="lua">
