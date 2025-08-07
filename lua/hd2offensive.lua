@@ -343,24 +343,37 @@ function HD2OffensiveHUD:init(data)
 end
 
 function HD2OffensiveHUD:update(t, dt)
-	-- 获取并设置HUD在self._position上的2D空间位置
 	local camera = managers.viewport:get_current_camera()
 
 	if not camera then
 		return
 	end
 
+	-- 获取并设置HUD在self._position上的2D空间位置
 	local ws = managers.hud._workspace
 	local screen_pos = ws:world_to_screen(camera, self._position)
 	self._panel:set_left(screen_pos.x - self._base_panel:w() / 2)
 	self._panel:set_bottom(screen_pos.y)
 
-	local distance = mvector3.distance(managers.player:player_unit():position(), self._position)
+	-- 获取并设置玩家距离HUD原点的距离
+	local distance = mvector3.distance(camera:position(), self._position)
 	local m_text = managers.localization:text("hud_hd2offensive_m")
 	self._distance:set_text(tostring(math.floor(distance / 100)) .. m_text)
 
+	-- 检测HUD有没有在视野范围内
 	if screen_pos.z > 1 then
-		self._panel:set_alpha(1)
+		local screen_center = Vector3(ws:panel():center_x(), ws:panel():center_y(), 0)
+		local HUDPos = Vector3(screen_pos.x, screen_pos.y, 0)
+		local cen_to_hud_dis = mvector3.distance(screen_center, HUDPos)
+
+		local max_alpha_dis = 150  -- 准心低于HUD距离多少开始透明度衰减
+		local min_alpha = 0.5  -- 最低透明度
+		if cen_to_hud_dis < max_alpha_dis then
+			local new_alpha = math.max(cen_to_hud_dis / max_alpha_dis, min_alpha)
+			self._panel:set_alpha(new_alpha)
+		else
+			self._panel:set_alpha(1)
+		end
 	else
 		self._panel:set_alpha(0)
 	end
