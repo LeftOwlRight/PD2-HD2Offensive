@@ -367,7 +367,7 @@ function HD2OffensiveHUD:update(t, dt)
 		local cen_to_hud_dis = mvector3.distance(screen_center, HUDPos)
 
 		local max_alpha_dis = 150  -- 准心低于HUD距离多少开始透明度衰减
-		local min_alpha = 0.5  -- 最低透明度
+		local min_alpha = 0.6  -- 最低透明度
 		if cen_to_hud_dis < max_alpha_dis then
 			local new_alpha = math.max(cen_to_hud_dis / max_alpha_dis, min_alpha)
 			self._panel:set_alpha(new_alpha)
@@ -407,3 +407,4 @@ function HD2OffensiveHUD:destroy()
 	local hud_panel = hud.panel
 	hud_panel:remove(self._panel)
 end
+
