@@ -28,23 +28,23 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 			-- dlc = "pd2_dlc_hd2o",
 			texture_bundle_folder = "pd2_dlc_hd2o",
 			anim_global_param = "projectile_four",
-			max_amount = 3,  --数量
+			max_amount = SC and 4 or 3,  --数量
 			throw_allowed_expire_t = 0.15,
 			expire_t = 1.1,
 			repeat_expire_t = 0.3,
-			base_cooldown = 60,  -- 投掷物CD
+			base_cooldown = SC and 180 or 60,  -- 投掷物CD
 			offensive = {
 				projectile_id = "launcher_m203",
 				neatly_x = true,
-				bombs = 6,
+				bombs = SC and 8 or 6,
 				range_x = 1300,
 				range_y = 300,
 				height = 6000,
 				launch_angle_x = -2000,
-				position_fix = 1650,
+				position_fix = SC and 1375 or 1650,
 				timer = 0.7,
 				delay = 3,
-				kill_assets_delay = 3.5,
+				kill_assets_delay = 3.7,
 				type = "fighter",
 				random_x = false
 			}
@@ -73,7 +73,7 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 			throw_allowed_expire_t = 0.15,
 			expire_t = 1.1,
 			repeat_expire_t = 0.3,
-			base_cooldown = 120,
+			base_cooldown = SC and 360 or 120,
 			offensive = {
 				projectile_id = "rocket_ray_frag",
 				bombs = 20,
@@ -81,9 +81,10 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 				range_y = 2000,
 				height = 8000,
 				launch_angle_x = -8000,
-				timer = 25,
+				position_fix = SC and 1635 or 0,
+				timer = SC and 30 or 25,
 				delay = 5,
-				kill_assets_delay = 25,
+				kill_assets_delay = 27,
 				type = "orbital"
 			}
 		}
@@ -111,7 +112,7 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 			throw_allowed_expire_t = 0.15,
 			expire_t = 1.1,
 			repeat_expire_t = 0.3,
-			base_cooldown = 40,
+			base_cooldown = SC and 30 or 40,
 			offensive = {
 				projectile_id = "rocket_frag",
 				height = 8000,
@@ -141,18 +142,19 @@ if RequiredScript== "lib/tweak_data/blackmarket/projectilestweakdata" then
 			-- dlc = "pd2_dlc_hd2o",
 			texture_bundle_folder = "pd2_dlc_hd2o",
 			anim_global_param = "projectile_four",
-			max_amount = 1,
+			max_amount = SC and 2 or 1,
 			throw_allowed_expire_t = 0.15,
 			expire_t = 1.1,
 			repeat_expire_t = 0.3,
-			base_cooldown = 60,
+			base_cooldown = SC and 150 or 60,
 			offensive = {
-				projectile_id = "launcher_poison_ms3gl_conversion",
+				projectile_id = SC and "launcher_poison_m32" or "launcher_poison_ms3gl_conversion",
 				bombs = 10,
 				range_x = 2000,
 				range_y = 2000,
 				height = 10000,
 				launch_angle_x = -1000,
+				position_fix = SC and 600 or 0,
 				timer = 1.5,
 				delay = 2,
 				kill_assets_delay = 3,
@@ -207,3 +209,4 @@ elseif RequiredScript == "lib/tweak_data/upgradestweakdata" then
 		end
 	end)
 end
+

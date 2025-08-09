@@ -1,4 +1,9 @@
 {
+	"hud_hd2offensive_m" : "m",
+	"hud_hd2offensive_inbound" : "Inbound",
+	"hud_hd2offensive_impact" : "Impact",
+	"hud_hd2offensive_ongoing" : "Ongoing",
+
 	"bm_wpn_prj_hd2offensive_eagle_airstrike" : "Eagle Airstrike",
 	"bm_wpn_prj_hd2offensive_eagle_airstrike_desc" : "A barrage of bombs creating a non-targeted carpet of explosions.\n\nWhen called, the strike will be perpendicular from the direction you were facing when thrown.\n\nCall-in Time: 3\nUses: Unlimited\nCooldown: 60",
 

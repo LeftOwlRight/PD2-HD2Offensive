@@ -12,6 +12,7 @@ function HD2OffensiveGrenade:_on_collision(...)
 	offensive_data.unit = self._unit
 	offensive_data.position = self._unit:position()
 	offensive_data.rotation = self._unit:rotation()
+	offensive_data.name_id = offensive_data.name_id or tweak_data.blackmarket.projectiles[self:get_name_id()].name_id
 	
 	HD2Offensive:throw(offensive_data)
 end
